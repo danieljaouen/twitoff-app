@@ -1,6 +1,7 @@
 from decouple import config
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from .models import DB, User, Tweet
+from .twitter import add_or_update_user
 
 def create_app():
 	app = Flask(__name__)
@@ -10,7 +11,7 @@ def create_app():
 
 	@app.route('/')
 	def root():
-		# users = User.query.all()
+		DB.create_all()
 		return render_template('base.html', title='hello')
 
 	@app.route('/reset')
@@ -19,15 +20,20 @@ def create_app():
 		DB.create_all()
 		return render_template('base.html', title='hello')
 
-	@app.route('/iris')
-	def iris():    
-		from sklearn.datasets import load_iris
-		from sklearn.linear_model import LogisticRegression
-		X, y = load_iris(return_X_y=True)
-		clf = LogisticRegression(
-			random_state=0, 
-			solver='lbfgs', 
-			multi_class='multinomial').fit(X, y)
-		return str(clf.predict(X[:2, :]))
+
+	@app.route('/user', methods=['POST'])
+	@app.route('/user/<name>', methods=['GET'])
+	def user(name=None, message=''):
+		name = name or request.values['user_name']
+		try:
+			if request.method == 'POST':
+				add_or_update_user(name)
+				message = f"User {name} successfully added!"
+			tweets = User.query.filter(User.name == name).one().tweets
+		except Exception as e:
+			message = f"Error adding {name}: {e}"
+			tweets = []
+		return render_template('user.html', title=name, 
+								tweets=tweets, message=message)
 
 	return app

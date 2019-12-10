@@ -4,6 +4,14 @@
 	</head>
 
 	<body>
-		<h1> Content goes here! </h1>
+		<h1> Twitoff! </h1>
+
+		{% block content %}
+		<form action="/user" method="post">
+			<input type="text" name="user_name" placeholder="User to add">
+			<input type="submit" name="Add User">
+		</form>
+		{% endblock %}
+
 	</body>
 </html>
