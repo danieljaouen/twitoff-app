@@ -12,6 +12,7 @@ basilica = "*"
 tweepy = "*"
 python-decouple = "*"
 scikit-learn = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
